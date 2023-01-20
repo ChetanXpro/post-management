@@ -1,13 +1,13 @@
 import mongoose, { Schema, model, SchemaType } from 'mongoose'
 
 const schema = new Schema({
-	documentId: { type: String, index: true },
+	cloneDocumentId: { type: String, index: true },
+	parentDocumentId: { type: String, index: true },
 	version: { type: Number, index: true },
 	stage: { type: String, require: true },
 	title: { type: String, require: true },
 	description: { type: String },
-	archived: { type: Boolean, default: false },
-	createdBy: { type: Schema.Types.ObjectId, ref: 'tryUser' },
+	cloneBy: { type: Schema.Types.ObjectId, ref: 'tryUser' },
 })
 
-export default model('Documents', schema)
+export default model('cloneDocuments', schema)

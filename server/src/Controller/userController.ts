@@ -1,4 +1,4 @@
-import User from '../Models/User'
+import tryUser from '../Models/User'
 
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcrypt'
@@ -12,7 +12,7 @@ export const createNewUser = asyncHandler(async (req: any, res: any) => {
 		return res.status(400).json({ message: 'Al fields are require' })
 	}
 
-	const duplicates = await User.find({ email }).lean().exec()
+	const duplicates = await tryUser.find({ email }).lean().exec()
 
 	if (duplicates.length) {
 		return res.status(409).json({
@@ -24,7 +24,7 @@ export const createNewUser = asyncHandler(async (req: any, res: any) => {
 
 	const userObject = { email, password: hashedPwd, role, name }
 
-	const user = await User.create(userObject)
+	const user = await tryUser.create(userObject)
 
 	if (!user) res.status(400).json({ messssage: `Invalid user data recevied` })
 
@@ -38,7 +38,7 @@ export const getUserById = asyncHandler(async (req: any, res: any) => {
 		return res.sendStatus(500).json({ success: false, message: 'something went wrong' })
 	}
 
-	const foundUser = await User.findById(id)
+	const foundUser = await tryUser.findById(id)
 
 	if (!foundUser) return res.status(400).json({ success: false, message: 'No user found with this id' })
 
@@ -58,7 +58,7 @@ export const login = asyncHandler(async (req: any, res: any) => {
 		res.status(400).json({ message: 'All field are required' })
 	}
 
-	const foundUser: any = await User.findOne({ email }).exec()
+	const foundUser: any = await tryUser.findOne({ email }).exec()
 
 	if (!foundUser || !foundUser.active) {
 		return res.status(401).json({ message: 'Unauthorized' })
