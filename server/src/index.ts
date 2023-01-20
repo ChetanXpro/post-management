@@ -1,18 +1,20 @@
 import dotenv from 'dotenv'
 dotenv.config()
-import express from 'express'
+import express, { json } from 'express'
 import connectDB from './config/db'
+import errorHandler from './Middleware/errorHandler'
 
 const app = express()
 
 const PORT = process.env.PORT || 3003
+app.use(errorHandler)
+app.use(json())
 
-import Documents from './Models/Documents'
-import User from './Models/User'
-import mongoose from 'mongoose'
+import Documents from './Routes/docRoutes'
+import User from './Routes/userRoutes'
 
-app.use('/api/doc', Documents)
-app.use('/api/doc', User)
+app.use('/doc', Documents)
+app.use('/user', User)
 
 connectDB()
 app.listen(PORT, () => {

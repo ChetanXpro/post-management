@@ -1,10 +1,12 @@
-import mongoose, { Schema, model } from 'mongoose'
+import mongoose, { Schema, model, SchemaType } from 'mongoose'
 
 const schema = new Schema({
 	documentId: { type: String, index: true },
 	version: { type: Number, index: true },
-	title: { type: String },
+	stage: { type: String, require: true },
+	title: { type: String, require: true },
 	discription: { type: String },
+	createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
 })
 
-export default model('Documents', schema)
+export default model('tryUser', schema)
