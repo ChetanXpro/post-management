@@ -112,11 +112,13 @@ export const createNewVersion = asyncHandler(async (req: any, res: any) => {
 
 	await foundDocument?.save()
 
+	const version = foundDocument!.version! + 1
+
 	const doc = await Documents.create({
 		documentId: foundClone?.parentDocumentId,
 		title: foundClone?.title,
 		description: foundClone?.description,
-		version: foundDocument!.version!++,
+		version: version,
 		stage: 'Approved',
 		archived: false,
 		createdBy: foundClone?.cloneBy,
