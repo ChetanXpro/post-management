@@ -18,7 +18,7 @@ export const apiPrivateInstance = axios.create({
 
 export const login = async (payload: any) => {
   try {
-    const request = await apiInstance.post("/auth", payload);
+    const request = await apiInstance.post("/user/auth", payload);
     return request?.data;
   } catch (err: any) {
     const error = err;

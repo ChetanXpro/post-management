@@ -6,8 +6,16 @@ const usePrivateApis = () => {
   const apiPrivateInstance = useAxiosPrivate();
 
   const toast = useToast({ position: "top" });
+  const getDocs = async()=>{
+  const request = await apiPrivateInstance.get('/doc')
+  
 
-  return {};
+  return request.data
+  }
+
+  return {
+    getDocs
+  };
 };
 
 export default usePrivateApis;

@@ -2,55 +2,55 @@ import { Button, Flex, Input, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { FormControl, FormErrorMessage } from "@chakra-ui/react";
-import { login } from "../../Api/api";
-import { useAtom } from "jotai";
+import { login, signup } from "../../Api/api";
 
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 // import useAuth from "../hooks/useAuth";
-// import { Backdrop, Modal } from "@mui/material";
-import jwtDecode from "jwt-decode";
 import { useToast } from "@chakra-ui/react";
-import { user } from "../../atoms/atoms";
-const Signin = () => {
+import { useEffect } from "react";
+
+const Signup = () => {
+  const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
+  const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
   const [email, setEmail] = useState("");
-  const from = location?.state?.from?.pathname || "/";
-
-  const navigate = useNavigate();
-  // const { setAuth, setUser } = useAuth();
-  const [success, setSuccess] = useState(false);
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [validName, setValidName] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const from = location?.state?.from?.pathname || "/";
+  const navigate = useNavigate();
   const toast = useToast({ position: "top" });
-  const [userData, setUserData] = useAtom(user);
 
-  const queryClient = useQueryClient();
-  const loc = useLocation();
-  const { isLoading, isError, error, mutate } = useMutation(login, {
-    onSuccess: (data: any) => {
+  
+  useEffect(() => {
+    setValidName(PWD_REGEX.test(password));
+  }, [password]);
+
+  const { isLoading, isError, error, mutate } = useMutation(signup, {
+    onSuccess: (data) => {
       toast({
-        title: "Logined Successfuly",
+        title: "Account created",
 
         status: "success",
         duration: 2000,
         isClosable: true,
       });
-      const token = data?.accessToken;
-      localStorage.setItem("jwt", token);
-
-      setUserData({
-        email: data.email,
-        name: data.name,
-      });
 
       setSuccess(true);
-
-      navigate(from, { replace: true });
+      setTimeout(() => {
+        navigate("/signin");
+      }, 400);
+    },
+    onError: () => {
+      console.log("error");
     },
   });
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e:any) => {
     e.preventDefault();
     const payload = {
-      email,
+      name: name,
+      email: email,
       password,
     };
     mutate(payload);
@@ -72,60 +72,71 @@ const Signin = () => {
             fontSize="2xl"
             mb={"6"}
           >
-            Login to your account
+            Create your account
           </Text>
+
+          <FormControl mb={"4"} isInvalid={validName}>
+            <Input
+              type={"name"}
+              h="10"
+              color={"whiteAlpha.900"}
+              autoComplete="true"
+              onChange={(e) => setName(e.target.value)}
+              placeholder="name"
+            />
+          </FormControl>
+          <FormControl mb={"4"} isInvalid={false}>
+            <Input
+              type={"email"}
+              h="10"
+              color={"whiteAlpha.900"}
+              autoComplete="true"
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email"
+            />
+          </FormControl>
+          <FormControl isInvalid={false}>
+            <Input
+              type={"password"}
+              h={"10"}
+              autoComplete="true"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              color={"whiteAlpha.900"}
+              placeholder="password"
+            />
+          </FormControl>
           <p
             style={{
-              textAlign: "center",
+              height: "5px",
               marginBottom: "12px",
-              marginTop: "4px",
+              marginTop: "6px",
               color: "red",
             }}
           >
             {isError ? `${error?.data?.message}` : ""}
           </p>
-          <FormControl mb={"4"} isInvalid={false}>
-            <Input
-              type={"email"}
-              h="12"
-              color={"whiteAlpha.900"}
-              autoComplete="true"
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-            />
-          </FormControl>
-          <FormControl mb={"4"} isInvalid={false}>
-            <Input
-              type={"password"}
-              h="12"
-              color={"whiteAlpha.900"}
-              autoComplete="true"
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="password"
-            />
-          </FormControl>
 
           <Button
             isLoading={isLoading}
-            loadingText="Checking..."
+            loadingText="Creating account"
             width={"full"}
             h="12"
             colorScheme={`${success ? "green" : "teal"}`}
-            mt={"2"}
+            mt={"4"}
             onClick={handleSubmit}
           >
-            {success ? "Logined Successfuly" : "Login"}
+            {success ? "Account Created" : "Sign up"}
           </Button>
         </form>
-        <div></div>
         <Flex mt={"4"} justifyContent="center">
           <span
             style={{ textAlign: "center", marginRight: "6px", color: "wheat" }}
           >
-            Don't have an account ?{" "}
+            Already have an account ?{" "}
           </span>
-          <Link className="text-blue-400" to={"/signup"}>
-            Sign up
+          <Link className="text-blue-400" to={"/signin"}>
+            Sign in
           </Link>
         </Flex>
       </Flex>
@@ -133,4 +144,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Signup;

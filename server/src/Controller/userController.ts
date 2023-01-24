@@ -45,6 +45,7 @@ export const getUserById = asyncHandler(async (req: any, res: any) => {
 	const userInfo = {
 		email: foundUser.email,
 		name: foundUser.name,
+		role: foundUser.roles,
 	}
 
 	res.status(200).json(userInfo)
@@ -71,6 +72,7 @@ export const login = asyncHandler(async (req: any, res: any) => {
 	const accessToken = jwt.sign(
 		{
 			id: foundUser.id,
+			role: foundUser.roles,
 		},
 		secret,
 		{ expiresIn: '24h' }

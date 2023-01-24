@@ -3,6 +3,7 @@ import {
 	cloneDocument,
 	createDocuments,
 	createNewVersion,
+	getAllPublicDoc,
 	rejectDocument,
 	submitCloneDocument,
 	submitForReview,
@@ -13,6 +14,7 @@ import verifyJWT from '../Middleware/verifyJwt'
 const router = Router()
 
 router.post('/', verifyJWT, createDocuments)
+router.get('/', verifyJWT, getAllPublicDoc)
 router.post('/submit', verifyJWT, submitForReview)
 router.post('/clone', verifyJWT, cloneDocument)
 router.post('/submitclone', verifyJWT, submitCloneDocument)

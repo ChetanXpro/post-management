@@ -56,10 +56,14 @@ const Header = () => {
             <Text>Home</Text>
           </Link>
 
-         
-          <Link to={"/profile"} className=" ml-4">
-            <Text>Creator</Text>
-          </Link>
+          {userData.role === "Admin" || "Creator" ? (
+            <Link to={"/creator"} className=" ml-4">
+              <Text>Creator</Text>
+            </Link>
+          ) : (
+            ""
+          )}
+
           {userData.role === "admin" ? (
             <Link to={"/uploadfiles"} className=" ml-4">
               <Text>Admin</Text>
@@ -68,7 +72,6 @@ const Header = () => {
             ""
           )}
 
-    
           <div className="flex gap-1 items-center">
             <IconButton
               onClick={toggleColorMode}

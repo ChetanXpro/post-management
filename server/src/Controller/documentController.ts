@@ -23,8 +23,6 @@ export const createDocuments = asyncHandler(async (req: any, res: any) => {
 	res.status(400).json({ message: `Document created in Editing stage ${title}` })
 })
 
-
-
 export const submitForReview = asyncHandler(async (req: any, res: any) => {
 	const { documentId } = req.body
 
@@ -55,11 +53,7 @@ export const rejectDocument = asyncHandler(async (req: any, res: any) => {
 	res.status(200).json({ message: 'Document is Rejected' })
 })
 
-// Creating version 2 of 
-
-
-
-
+// Creating version 2 of
 
 export const cloneDocument = asyncHandler(async (req: any, res: any) => {
 	const { documentId } = req.body
@@ -104,8 +98,6 @@ export const submitCloneDocument = asyncHandler(async (req: any, res: any) => {
 
 // admin
 
-
-
 export const createNewVersion = asyncHandler(async (req: any, res: any) => {
 	const { cloneDocumentId } = req.body
 
@@ -115,8 +107,7 @@ export const createNewVersion = asyncHandler(async (req: any, res: any) => {
 		documentId: foundClone?.parentDocumentId,
 		version: foundClone?.version,
 	})
-
-
+	console.log(foundDocument)
 	foundDocument!.archived = true
 
 	await foundDocument?.save()
@@ -146,4 +137,12 @@ export const rejectCloneDocument = asyncHandler(async (req: any, res: any) => {
 	if (!acknowledged) return res.status(400).json({ message: 'Something went wrong' })
 
 	res.status(200).json({ message: 'Clone Document is Rejected' })
+})
+
+// Get data
+
+export const getAllPublicDoc = asyncHandler(async (req, res) => {
+	const allApprovedDoc = await Documents.find({ stage: 'Approved', archived: false })
+
+	res.status(200).json({ allApprovedDoc })
 })
