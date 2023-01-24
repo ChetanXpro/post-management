@@ -23,6 +23,8 @@ export const createDocuments = asyncHandler(async (req: any, res: any) => {
 	res.status(400).json({ message: `Document created in Editing stage ${title}` })
 })
 
+
+
 export const submitForReview = asyncHandler(async (req: any, res: any) => {
 	const { documentId } = req.body
 
@@ -53,7 +55,11 @@ export const rejectDocument = asyncHandler(async (req: any, res: any) => {
 	res.status(200).json({ message: 'Document is Rejected' })
 })
 
-// Creating version 2 of
+// Creating version 2 of 
+
+
+
+
 
 export const cloneDocument = asyncHandler(async (req: any, res: any) => {
 	const { documentId } = req.body
@@ -98,6 +104,8 @@ export const submitCloneDocument = asyncHandler(async (req: any, res: any) => {
 
 // admin
 
+
+
 export const createNewVersion = asyncHandler(async (req: any, res: any) => {
 	const { cloneDocumentId } = req.body
 
@@ -107,6 +115,7 @@ export const createNewVersion = asyncHandler(async (req: any, res: any) => {
 		documentId: foundClone?.parentDocumentId,
 		version: foundClone?.version,
 	})
+
 
 	foundDocument!.archived = true
 

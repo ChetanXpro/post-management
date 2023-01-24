@@ -1,5 +1,6 @@
 import mongoose, { Schema, model, SchemaType } from 'mongoose'
 
+
 const schema = new Schema({
 	cloneDocumentId: { type: String, index: true },
 	parentDocumentId: { type: String, index: true },
