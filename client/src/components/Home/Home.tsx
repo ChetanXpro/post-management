@@ -29,36 +29,32 @@ import useAuthentication from "../../hook/useAuthentication";
 import usePrivateApis from "../../hook/usePrivateApis";
 
 const Home = () => {
-  const { getDocs, createDoc } = usePrivateApis();
- 
-  const [editTitle, setEditTitle] = useState("");
+  const { getDocs, cloneDocs } = usePrivateApis();
+
+  const [documentId, setDocumentId] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const { data, isLoading } = useQuery("docs", getDocs);
   const { role } = useAuthentication();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast({ position: "top" });
 
-  const btnRef = React.useRef();
-  const btnReff = React.useRef();
-  interface updateJournalEntryVariables {
-    title: string;
-    description: string;
-  }
-  
+  const btnRef = React.useRef() as any;
+
+  const { mutate } = useMutation(cloneDocs);
+
+  const cloneDoc = () => {
+    mutate({ documentId });
+  };
 
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
   return (
     <div className="m-6">
-      
-      <SimpleGrid
-        spacing={4}
-        templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
-      >
+      <div className="w-full flex flex-wrap gap-4  ">
         {data &&
           data.allApprovedDoc.map((i: any) => (
-            <Card key={i._id}>
+            <Card key={i._id} w="80">
               <CardHeader>
                 <Heading size="md">{i.title}</Heading>
               </CardHeader>
@@ -67,8 +63,8 @@ const Home = () => {
               </CardBody>
               <CardFooter>
                 {role === "Admin" ? (
-                  <Button ref={btnRef} colorScheme="teal" onClick={onOpen}>
-                    Edit
+                  <Button ref={btnRef}  colorScheme="teal" onClick={onOpen}>
+                    Clone
                   </Button>
                 ) : (
                   ""
@@ -79,7 +75,7 @@ const Home = () => {
               </CardFooter>
             </Card>
           ))}
-      </SimpleGrid>
+      </div>
       <Drawer
         isOpen={isOpen}
         placement="right"
@@ -104,7 +100,6 @@ const Home = () => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-      
     </div>
   );
 };

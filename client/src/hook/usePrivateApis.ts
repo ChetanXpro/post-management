@@ -81,6 +81,20 @@ const usePrivateApis = () => {
     }
     return request.data;
   };
+  const cloneDocs = async (payload: { documentId: string }) => {
+    const request = await apiPrivateInstance.post("/doc/clone", {
+      documentId: payload.documentId,
+    });
+    if (request.status === 200) {
+      toast({
+        title: "Document cloned",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    return request.data;
+  };
 
   return {
     getDocs,
@@ -89,6 +103,7 @@ const usePrivateApis = () => {
     getEditingDocs,
     submitDocs,
     editCreatorDocs,
+    cloneDocs,
   };
 };
 

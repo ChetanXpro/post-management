@@ -65,7 +65,7 @@ const Profile = () => {
     onOpen: alertOpen,
     onClose: alertClose,
   } = useDisclosure();
-  const cancelRef = React.useRef();
+  const cancelRef = useRef() as any;
   const {
     isOpen: isDrawerOpen,
     onOpen: open,
@@ -84,8 +84,8 @@ const Profile = () => {
   } = useQuery("editing", getEditingDocs);
   console.log(editDocsList);
   const navigate = useNavigate();
-  const btnReff = React.useRef();
-  const btnRef = React.useRef();
+  const btnReff = useRef() as any;
+  const btnRef = useRef() as any;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const toast = useToast({ position: "top" });
@@ -163,14 +163,16 @@ const Profile = () => {
       <Tabs
         variant="soft-rounded"
         mt={"3"}
-        ml="3"
+        
         h={"full"}
+        w='full'
         colorScheme="green"
       >
-        <TabList px={"6"}>
+        <TabList px={"6"}  >
           <div className="flex  mb-4   w-full">
             <Tab>Editing</Tab>
             <Tab>Pending</Tab>
+            <Tab>Clone</Tab>
           </div>
           <Button
             className="w-30"
@@ -181,10 +183,10 @@ const Profile = () => {
             Create New Doc
           </Button>
         </TabList>
-        <TabPanels>
+        <TabPanels pl={'10'}  >
           <TabPanel>
             <div className="flex flex-col items-center justify-center   w-full ">
-              <div className="w-full flex flex-wrap gap-4 pl-16 ">
+              <div className="w-full flex flex-wrap gap-4  ">
                 {editDocsList &&
                   editDocsList.editingDocs.map((i: any) => (
                     <Card key={i._id} w={"80"}>
@@ -274,7 +276,7 @@ const Profile = () => {
             <div className="flex flex-col items-center justify-center   w-full ">
               <div className="w-full flex flex-wrap gap-4 pl-16 ">
                 {data &&
-                  data.pendingDocs.map((i:any) => (
+                  data.pendingDocs.map((i: any) => (
                     <Card key={i._id} w={"80"}>
                       <CardHeader>
                         <Heading size="sm">{i.title}</Heading>
@@ -338,12 +340,36 @@ const Profile = () => {
               </Drawer>
             </div>
           </TabPanel>
+          <TabPanel>
+            <div className="flex flex-col items-center justify-center   w-full ">
+              <div className="w-full flex flex-wrap gap-4 pl-16 ">
+              {data &&
+                  data.pendingDocs.map((i: any) => (
+                    <Card key={i._id} w={"80"}>
+                      <CardHeader>
+                        <Heading size="sm">{i.title}</Heading>
+                      </CardHeader>
+                      <CardBody>
+                        <Text>{i.description}</Text>
+                      </CardBody>
+                      <Divider />
+                      <CardFooter>
+                        <Center width="full" justifyContent={"space-between"}>
+                          <Text>{i.stage}</Text>
+                          <Text>Version {i.version}</Text>
+                        </Center>
+                      </CardFooter>
+                    </Card>
+                  ))}
+              </div>
+            </div>
+          </TabPanel>
         </TabPanels>
       </Tabs>
       <AlertDialog
         isOpen={isAlertOpen}
         leastDestructiveRef={cancelRef}
-        motionPreset='slideInBottom'
+        motionPreset="slideInBottom"
         onClose={alertClose}
       >
         <AlertDialogOverlay>
