@@ -10,12 +10,14 @@ import { HamburgerIcon, Icon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 import MenuItems from "./MenuItems";
 import AvtarDrop from "./AvtarDrop";
+import useAuthentication from "../../../hook/useAuthentication";
 
 const Header = () => {
   const [active, setActive] = useState(false);
   const [avtarDrop, setAvtarDrop] = useState(false);
   const { colorMode, toggleColorMode } = useColorMode();
-  const [userData, setUser] = useAtom(user);
+  // const [userData, setUser] = useAtom(user);
+  const { userData } = useAuthentication();
   const navigate = useNavigate();
   const showMenu = () => {
     setActive(!active);

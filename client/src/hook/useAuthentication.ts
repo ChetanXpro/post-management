@@ -39,7 +39,7 @@ const useAuthentication = () => {
   }, [path, isLogin]);
 
 
-  return { isLogin, isLoggedIn, data, role };
+  return { isLogin, isLoggedIn, data, role ,userData};
 };
 
 export default useAuthentication;

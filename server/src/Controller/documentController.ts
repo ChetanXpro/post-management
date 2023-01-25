@@ -20,7 +20,7 @@ export const createDocuments = asyncHandler(async (req: any, res: any) => {
 		description,
 	})
 
-	res.status(400).json({ message: `Document created in Editing stage ${title}` })
+	res.status(200).json({ message: `Document created in Editing stage ${title}` })
 })
 
 export const submitForReview = asyncHandler(async (req: any, res: any) => {
@@ -145,4 +145,33 @@ export const getAllPublicDoc = asyncHandler(async (req, res) => {
 	const allApprovedDoc = await Documents.find({ stage: 'Approved', archived: false })
 
 	res.status(200).json({ allApprovedDoc })
+})
+
+export const getPendingDocs = asyncHandler(async (req: any, res: any) => {
+	const doc = await Documents.find({ createdBy: req.id, stage: 'Pending approval' })
+	const cloneDoc = await CloneDocument.find({ cloneBy: req.id, stage: 'Pending approval' })
+	const pendingDocs = [...doc, ...cloneDoc]
+
+	res.status(200).json({ pendingDocs })
+})
+
+export const getEditingDocs = asyncHandler(async (req: any, res: any) => {
+	const doc = await Documents.find({ createdBy: req.id, stage: 'Editing' })
+	const cloneDoc = await CloneDocument.find({ cloneBy: req.id, stage: 'Editing' })
+	const editingDocs = [...doc, ...cloneDoc]
+
+	res.status(200).json({ editingDocs })
+})
+
+export const editCreatorDocs = asyncHandler(async (req: any, res: any) => {
+	console.log(req.body)
+	const payload = req.body
+	console.log(payload)
+
+	const { title, description, documentId } = payload
+	if (!title || !description || !documentId) return res.status(400).json({ message: 'Please provide all inputs' })
+
+	const editied = await Documents.findOneAndUpdate({ documentId, stage: 'Editing' }, { title: title, description })
+	if (!editied) return res.status(400).json({ message: 'No document with this id' })
+	res.status(200).json({ editied })
 })

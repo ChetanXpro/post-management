@@ -3,7 +3,10 @@ import {
 	cloneDocument,
 	createDocuments,
 	createNewVersion,
+	editCreatorDocs,
 	getAllPublicDoc,
+	getEditingDocs,
+	getPendingDocs,
 	rejectDocument,
 	submitCloneDocument,
 	submitForReview,
@@ -15,6 +18,9 @@ const router = Router()
 
 router.post('/', verifyJWT, createDocuments)
 router.get('/', verifyJWT, getAllPublicDoc)
+router.get('/getPending', verifyJWT, getPendingDocs)
+router.get('/getEditing', verifyJWT, getEditingDocs)
+router.put('/edit', verifyJWT, editCreatorDocs)
 router.post('/submit', verifyJWT, submitForReview)
 router.post('/clone', verifyJWT, cloneDocument)
 router.post('/submitclone', verifyJWT, submitCloneDocument)

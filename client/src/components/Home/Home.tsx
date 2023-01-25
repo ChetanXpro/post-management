@@ -12,30 +12,46 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  FormControl,
+  FormLabel,
   Heading,
   Input,
   SimpleGrid,
+  TagLabel,
   Text,
+  Textarea,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import React from "react";
-import { useQuery } from "react-query";
+import React, { useState } from "react";
+import { useMutation, useQuery } from "react-query";
 import useAuthentication from "../../hook/useAuthentication";
 import usePrivateApis from "../../hook/usePrivateApis";
 
 const Home = () => {
-  const { getDocs } = usePrivateApis();
+  const { getDocs, createDoc } = usePrivateApis();
+ 
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const { data, isLoading } = useQuery("docs", getDocs);
   const { role } = useAuthentication();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast({ position: "top" });
+
   const btnRef = React.useRef();
+  const btnReff = React.useRef();
+  interface updateJournalEntryVariables {
+    title: string;
+    description: string;
+  }
+  
 
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
-
   return (
     <div className="m-6">
+      
       <SimpleGrid
         spacing={4}
         templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
@@ -57,7 +73,7 @@ const Home = () => {
                 ) : (
                   ""
                 )}
-                <Center  width='full' justifyContent={'end'}>
+                <Center width="full" justifyContent={"end"}>
                   <Text>Version {i.version}</Text>
                 </Center>
               </CardFooter>
@@ -68,12 +84,13 @@ const Home = () => {
         isOpen={isOpen}
         placement="right"
         onClose={onClose}
+        size="sm"
         finalFocusRef={btnRef}
       >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Create your account</DrawerHeader>
+          <DrawerHeader>Edit Document</DrawerHeader>
 
           <DrawerBody>
             <Input placeholder="Type here..." />
@@ -83,10 +100,11 @@ const Home = () => {
             <Button variant="outline" mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme="blue">Save</Button>
+            <Button colorScheme="blue">Submit Request</Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+      
     </div>
   );
 };
