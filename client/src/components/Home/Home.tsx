@@ -42,15 +42,14 @@ const Home = () => {
 
   const { mutate } = useMutation(cloneDocs);
 
-  // const cloneDoc = () => {
-  //   mutate({ documentId });
-  // };
+ 
 
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
   return (
     <div className="m-6">
+      <Heading textAlign={'center'} mb='4' mt='-4'>Public Documents</Heading>
       <div className="w-full flex flex-wrap gap-4  ">
         {data &&
           data.allApprovedDoc.map((i: any) => (
@@ -62,7 +61,7 @@ const Home = () => {
                 <Text>{i.description}</Text>
               </CardBody>
               <CardFooter>
-                {role === "Admin" || role === 'Creator' ? (
+                {role === "Admin" || role === "Creator" ? (
                   <Button
                     colorScheme="teal"
                     onClick={() => {

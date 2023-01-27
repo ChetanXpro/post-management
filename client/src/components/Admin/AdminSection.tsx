@@ -77,11 +77,11 @@ const AdminSection = () => {
   return (
     <div className="flex flex-col relative  items-center">
       <Tabs variant="soft-rounded" h={"full"} w="full" colorScheme="green">
-        <TabList m="2">
+        <TabList m={'3'}>
           <Tab>New Document</Tab>
           <Tab>New Version</Tab>
         </TabList>
-        <TabPanels>
+        <TabPanels px={'6'}>
           <TabPanel>
             <div className="flex flex-col items-center justify-center   w-full ">
               <div className="w-full flex flex-wrap gap-4  justify-center  ">
