@@ -15,15 +15,14 @@ const useAuthentication = () => {
 
   const isLogin = !!localStorage.getItem("jwt");
   const token = localStorage.getItem("jwt");
-  const decoded: any = jwtDecode(token || "");
- 
+
   const [role, setRole] = useState("");
 
   useEffect(() => {
     const fetchuser = async () => {
       try {
         const request = await apiPrivateInstance.get("/user/getUser");
-        
+
         setRole(request.data?.role);
         setData(request.data);
         setUserData(request?.data);
@@ -38,8 +37,7 @@ const useAuthentication = () => {
     setIsLoggedIn(true);
   }, [path, isLogin]);
 
-
-  return { isLogin, isLoggedIn, data, role ,userData};
+  return { isLogin, isLoggedIn, data, role, userData };
 };
 
 export default useAuthentication;

@@ -24,7 +24,7 @@ const useAxiosPrivate = () => {
       (response) => response,
       async (error) => {
         if (error?.response?.status === 403) {
-          navigate("/sign_in");
+          navigate("/signin");
         }
         return Promise.reject(error);
       }

@@ -10,7 +10,7 @@ const AvtarDrop = ({ setAvtarDrop }: any) => {
 
   const logout = () => {
     localStorage.removeItem("jwt");
-    navigate("sign_in");
+    navigate("signin");
   };
 
   return (

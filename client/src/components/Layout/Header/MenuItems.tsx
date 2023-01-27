@@ -16,7 +16,7 @@ const MenuItems = ({ showMenu, active }: any) => {
   const logout = () => {
     localStorage.removeItem("jwt");
     showMenu();
-    navigate("sign_in");
+    navigate("signin");
   };
   return (
     <ul
