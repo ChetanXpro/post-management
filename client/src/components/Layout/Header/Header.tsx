@@ -58,7 +58,7 @@ const Header = () => {
             <Text>Home</Text>
           </Link>
 
-          {userData.role === "Admin" || "Creator" ? (
+          {userData.role === "Admin" || userData.role === "Creator" ? (
             <Link to={"/creator"} className=" ml-4">
               <Text>Creator</Text>
             </Link>
@@ -66,8 +66,8 @@ const Header = () => {
             ""
           )}
 
-          {userData.role === "admin" ? (
-            <Link to={"/uploadfiles"} className=" ml-4">
+          {userData.role === "Admin" ? (
+            <Link to={"/admin"} className=" ml-4">
               <Text>Admin</Text>
             </Link>
           ) : (

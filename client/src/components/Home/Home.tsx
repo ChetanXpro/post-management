@@ -42,9 +42,9 @@ const Home = () => {
 
   const { mutate } = useMutation(cloneDocs);
 
-  const cloneDoc = () => {
-    mutate({ documentId });
-  };
+  // const cloneDoc = () => {
+  //   mutate({ documentId });
+  // };
 
   if (isLoading) {
     return <h1>Loading...</h1>;
@@ -62,8 +62,13 @@ const Home = () => {
                 <Text>{i.description}</Text>
               </CardBody>
               <CardFooter>
-                {role === "Admin" ? (
-                  <Button ref={btnRef}  colorScheme="teal" onClick={onOpen}>
+                {role === "Admin" || role === 'Creator' ? (
+                  <Button
+                    colorScheme="teal"
+                    onClick={() => {
+                      mutate({ documentId: i.documentId });
+                    }}
+                  >
                     Clone
                   </Button>
                 ) : (

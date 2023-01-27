@@ -1,10 +1,11 @@
 import mongoose, { Schema, model, SchemaType } from 'mongoose'
 
-
 const schema = new Schema({
 	cloneDocumentId: { type: String, index: true },
 	parentDocumentId: { type: String, index: true },
 	version: { type: Number, index: true },
+	parentTitle: { type: String },
+	parentDescription: { type: String },
 	stage: { type: String, require: true },
 	title: { type: String, require: true },
 	description: { type: String },

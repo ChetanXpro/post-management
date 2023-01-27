@@ -58,16 +58,21 @@ export const rejectDocument = asyncHandler(async (req: any, res: any) => {
 export const cloneDocument = asyncHandler(async (req: any, res: any) => {
 	const { documentId } = req.body
 
-	const foundDocument = await Documents.findOne({ documentId })
+	
+
+	const foundDocument = await Documents.findOne({ documentId, archived: false })
 
 	if (!foundDocument) return res.status(400).json({ message: 'No document found with this id' })
 
 	const id = crypto.randomUUID()
+	console.log(foundDocument)
 
 	const obj = await CloneDocument.create({
 		cloneDocumentId: id,
 		parentDocumentId: foundDocument.documentId,
 		title: foundDocument.title,
+		parentTitle: foundDocument.title,
+		parentDescription: foundDocument.description,
 		stage: 'Editing',
 		description: foundDocument.description,
 		version: foundDocument.version,
@@ -82,14 +87,11 @@ export const cloneDocument = asyncHandler(async (req: any, res: any) => {
 // Clone documents services
 
 export const submitCloneDocument = asyncHandler(async (req: any, res: any) => {
-	const { cloneDocumentId, title, description } = req.body
+	const { cloneDocumentId } = req.body
 
-	if (!cloneDocumentId || !title || !description) return res.status(400).json({ message: 'Provide all inputs' })
+	if (!cloneDocumentId) return res.status(400).json({ message: 'Provide all inputs' })
 
-	const { acknowledged } = await CloneDocument.updateOne(
-		{ cloneDocumentId },
-		{ stage: 'Pending approval', title, description }
-	)
+	const { acknowledged } = await CloneDocument.updateOne({ cloneDocumentId }, { stage: 'Pending approval' })
 
 	if (!acknowledged) return res.status(400).json({ message: 'Something went wrong' })
 
@@ -157,21 +159,48 @@ export const getPendingDocs = asyncHandler(async (req: any, res: any) => {
 
 export const getEditingDocs = asyncHandler(async (req: any, res: any) => {
 	const doc = await Documents.find({ createdBy: req.id, stage: 'Editing' })
-	const cloneDoc = await CloneDocument.find({ cloneBy: req.id, stage: 'Editing' })
-	const editingDocs = [...doc, ...cloneDoc]
+
+	const editingDocs = [...doc]
 
 	res.status(200).json({ editingDocs })
 })
 
 export const editCreatorDocs = asyncHandler(async (req: any, res: any) => {
-	console.log(req.body)
 	const payload = req.body
-	console.log(payload)
 
 	const { title, description, documentId } = payload
 	if (!title || !description || !documentId) return res.status(400).json({ message: 'Please provide all inputs' })
 
-	const editied = await Documents.findOneAndUpdate({ documentId, stage: 'Editing' }, { title: title, description })
+	const editied = await Documents.findOneAndUpdate(
+		{ documentId, stage: 'Editing', archived: false },
+		{ title: title, description }
+	)
 	if (!editied) return res.status(400).json({ message: 'No document with this id' })
 	res.status(200).json({ editied })
 })
+
+export const getClonedDocs = asyncHandler(async (req: any, res: any) => {
+	const cloneDoc = await CloneDocument.find({ cloneBy: req.id, stage: 'Editing' })
+
+	const cloneDocList = [...cloneDoc]
+
+	res.status(200).json({ cloneDocList })
+})
+export const editCloneDoc = asyncHandler(async (req: any, res: any) => {
+	const payload = req.body
+	console.log(payload)
+
+	const { title, description, cloneDocumentId } = payload
+	if (!title || !description || !cloneDocumentId)
+		return res.status(400).json({ message: 'Please provide all inputs' })
+
+	const editied = await CloneDocument.findOneAndUpdate(
+		{ cloneDocumentId, stage: 'Editing' },
+		{ title: title, description }
+	)
+	console.log(editied)
+	if (!editied) return res.status(400).json({ message: 'No document with this id' })
+	res.status(200).json({ editied })
+})
+
+// admin

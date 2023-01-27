@@ -68,6 +68,23 @@ const usePrivateApis = () => {
     }
     return request.data;
   };
+  const editCloneDocs = async (payload: {
+    title: string;
+    description: string;
+    cloneDocumentId: string;
+  }) => {
+    const request = await apiPrivateInstance.put("/doc/editclone", payload);
+    if (request.status === 200) {
+      toast({
+        title: "Document edited",
+
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    return request.data;
+  };
   const submitDocs = async (payload: { documentId: string }) => {
     const request = await apiPrivateInstance.post("/doc/submit", payload);
     if (request.status === 200) {
@@ -79,6 +96,12 @@ const usePrivateApis = () => {
         isClosable: true,
       });
     }
+    return request.data;
+  };
+
+  const getCloneDocs = async () => {
+    const request = await apiPrivateInstance.get("/doc/getClone");
+
     return request.data;
   };
   const cloneDocs = async (payload: { documentId: string }) => {
@@ -95,6 +118,75 @@ const usePrivateApis = () => {
     }
     return request.data;
   };
+  const submitClone = async (payload: { cloneDocumentId: string }) => {
+    const request = await apiPrivateInstance.post("/doc/submitclone", {
+      cloneDocumentId: payload.cloneDocumentId,
+    });
+    if (request.status === 200) {
+      toast({
+        title: "Submit for approval",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    return request.data;
+  };
+  const approveClone = async (payload: { cloneDocumentId: string }) => {
+    const request = await apiPrivateInstance.post("/doc/admin/approveclone", {
+      cloneDocumentId: payload.cloneDocumentId,
+    });
+    if (request.status === 200) {
+      toast({
+        title: "Approved",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    return request.data;
+  };
+  const rejectClone = async (payload: { cloneDocumentId: string }) => {
+    const request = await apiPrivateInstance.post("/doc/admin/rejectclone", {
+      cloneDocumentId: payload.cloneDocumentId,
+    });
+    if (request.status === 200) {
+      toast({
+        title: "Rejected",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    return request.data;
+  };
+
+  const rejectDocs = async (payload: { documentId: string }) => {
+    const request = await apiPrivateInstance.post("/doc/admin/reject", payload);
+    if (request.status === 200) {
+      toast({
+        title: "Rejected",
+
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    return request.data;
+  };
+  const approveDocs = async (payload: { documentId: string }) => {
+    const request = await apiPrivateInstance.post("/doc/admin/approve", payload);
+    if (request.status === 200) {
+      toast({
+        title: "Approved",
+
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    return request.data;
+  };
 
   return {
     getDocs,
@@ -103,7 +195,14 @@ const usePrivateApis = () => {
     getEditingDocs,
     submitDocs,
     editCreatorDocs,
+    submitClone,
     cloneDocs,
+    getCloneDocs,
+    approveClone,
+    editCloneDocs,
+    rejectClone,
+    rejectDocs,
+    approveDocs,
   };
 };
 

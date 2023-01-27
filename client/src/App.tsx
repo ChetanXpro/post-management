@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import AdminSection from "./components/Admin/AdminSection";
 import Creator from "./components/Creator/Creator";
 import Home from "./components/Home/Home";
 import Dashboard from "./components/Layout/Dashboard/Dashboard";
@@ -15,6 +16,7 @@ function App() {
       <Route path="/" element={<Dashboard />}>
         <Route index element={<Home />} />
         <Route path="creator" element={<Creator />} />
+        <Route path="admin" element={<AdminSection />} />
       </Route>
     </Routes>
   );

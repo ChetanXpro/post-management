@@ -34,12 +34,15 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
+  Highlight,
 } from "@chakra-ui/react";
 import React, { useReducer, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { useNavigate } from "react-router-dom";
 import usePrivateApis from "../../hook/usePrivateApis";
+import Loader from "../Loader/Loader";
+import NoData from "../NoData/NoData";
 interface updateJournalEntryVariables {
   title: string;
   description: string;
@@ -51,8 +54,11 @@ const Profile = () => {
   const {
     createDoc,
     editCreatorDocs,
+    editCloneDocs,
     getPendingDocs,
+    getCloneDocs,
     getEditingDocs,
+    submitClone,
     submitDocs,
   } = usePrivateApis();
   const [createTitle, setCreateTitle] = useState<any>("");
@@ -60,6 +66,11 @@ const Profile = () => {
   const [editTitle, setEditTitle] = useState<string>("");
   const [editDescription, setEditDescription] = useState<string>("");
   const [editDocumentId, setEditDocumentId] = useState<string>("");
+  const [editCloneDocumentId, setEditCloneDocumentId] = useState<string>("");
+
+  const [editCloneTitle, setEditCloneTitle] = useState<string>("");
+  const [editCloneDescription, setEditCloneDescription] = useState<string>("");
+
   const {
     isOpen: isAlertOpen,
     onOpen: alertOpen,
@@ -77,16 +88,27 @@ const Profile = () => {
     data,
     refetch: pendingRefetch,
   } = useQuery("pending", getPendingDocs);
+  console.log(data);
   const {
     isLoading: loading,
     data: editDocsList,
     refetch,
   } = useQuery("editing", getEditingDocs);
-  console.log(editDocsList);
+  const { data: editCloneList, refetch: refetchCloneList } = useQuery(
+    "cloneEdit",
+    getCloneDocs
+  );
+
   const navigate = useNavigate();
   const btnReff = useRef() as any;
   const btnRef = useRef() as any;
+  const cloneRef = useRef() as any;
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isCloneOpen,
+    onOpen: openClone,
+    onClose: closeClone,
+  } = useDisclosure();
 
   const toast = useToast({ position: "top" });
 
@@ -110,6 +132,16 @@ const Profile = () => {
       setEditDocumentId("");
     },
   });
+  const { mutate: editCloneDoc } = useMutation(editCloneDocs, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("cloneEdit");
+      refetchCloneList();
+      closeClone();
+      setEditCloneDescription("");
+      setEditCloneTitle("");
+      setEditCloneDocumentId("");
+    },
+  });
   const { mutate: submitMutate } = useMutation(submitDocs, {
     onSuccess: () => {
       queryClient.invalidateQueries("editing");
@@ -118,6 +150,14 @@ const Profile = () => {
       pendingRefetch();
       alertClose();
       setSubmitDocumentId("");
+    },
+  });
+  const { mutate: submitCloneMutate } = useMutation(submitClone, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("cloneEdit");
+      refetchCloneList();
+      queryClient.invalidateQueries("pending");
+      pendingRefetch();
     },
   });
   const handleEdit = () => {
@@ -135,6 +175,22 @@ const Profile = () => {
       documentId: editDocumentId,
     };
     editDoc(payload);
+  };
+  const handleCloneEdit = () => {
+    if (!editCloneTitle || !editCloneDescription || !editCloneDocumentId) {
+      return toast({
+        title: "Please fill all inputs",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+    const payload = {
+      title: editCloneTitle,
+      description: editCloneDescription,
+      cloneDocumentId: editCloneDocumentId,
+    };
+    editCloneDoc(payload);
   };
 
   const handleCreate = () => {
@@ -154,7 +210,7 @@ const Profile = () => {
     submitMutate(payload);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="flex flex-col relative  items-center">
@@ -163,12 +219,11 @@ const Profile = () => {
       <Tabs
         variant="soft-rounded"
         mt={"3"}
-        
         h={"full"}
-        w='full'
+        w="full"
         colorScheme="green"
       >
-        <TabList px={"6"}  >
+        <TabList px={"6"}>
           <div className="flex  mb-4   w-full">
             <Tab>Editing</Tab>
             <Tab>Pending</Tab>
@@ -183,11 +238,11 @@ const Profile = () => {
             Create New Doc
           </Button>
         </TabList>
-        <TabPanels pl={'10'}  >
+        <TabPanels pl={"10"}>
           <TabPanel>
             <div className="flex flex-col items-center justify-center   w-full ">
               <div className="w-full flex flex-wrap gap-4  ">
-                {editDocsList &&
+                {editDocsList && editDocsList.editingDocs.length > 0 ? (
                   editDocsList.editingDocs.map((i: any) => (
                     <Card key={i._id} w={"80"}>
                       <CardHeader>
@@ -214,8 +269,8 @@ const Profile = () => {
                           <Button
                             colorScheme="blue"
                             onClick={() => {
-                              setSubmitDocumentId(i.documentId);
                               alertOpen();
+                              setSubmitDocumentId(i.documentId);
                             }}
                             mr={3}
                           >
@@ -224,7 +279,10 @@ const Profile = () => {
                         </Center>
                       </CardFooter>
                     </Card>
-                  ))}
+                  ))
+                ) : (
+                  <NoData display="No Document found" />
+                )}
               </div>
               <Drawer
                 isOpen={isOpen}
@@ -270,16 +328,58 @@ const Profile = () => {
                   </DrawerFooter>
                 </DrawerContent>
               </Drawer>
+              <AlertDialog
+                isOpen={isAlertOpen}
+                leastDestructiveRef={cancelRef}
+                motionPreset="slideInBottom"
+                onClose={alertClose}
+              >
+                <AlertDialogOverlay>
+                  <AlertDialogContent>
+                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                      Submit for Review
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                      Are you sure? You want to submit this document for review.
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                      <Button ref={cancelRef} onClick={alertClose}>
+                        Cancel
+                      </Button>
+                      <Button colorScheme="green" onClick={handleSubmit} ml={3}>
+                        Submit
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialogOverlay>
+              </AlertDialog>
             </div>
           </TabPanel>
           <TabPanel>
             <div className="flex flex-col items-center justify-center   w-full ">
               <div className="w-full flex flex-wrap gap-4 pl-16 ">
-                {data &&
+                {data && data.pendingDocs.length > 0 ? (
                   data.pendingDocs.map((i: any) => (
                     <Card key={i._id} w={"80"}>
                       <CardHeader>
-                        <Heading size="sm">{i.title}</Heading>
+                        <div className="flex items-center justify-between">
+                          <Heading size="sm">{i.title}</Heading>
+                          {i.cloneBy && (
+                            <Highlight
+                              query="Clone"
+                              styles={{
+                                px: "2",
+                                py: "1",
+                                rounded: "full",
+                                bg: "red.100",
+                              }}
+                            >
+                              Clone
+                            </Highlight>
+                          )}
+                        </div>
                       </CardHeader>
                       <CardBody>
                         <Text>{i.description}</Text>
@@ -292,7 +392,10 @@ const Profile = () => {
                         </Center>
                       </CardFooter>
                     </Card>
-                  ))}
+                  ))
+                ) : (
+                  <NoData display="No Pending Doc Found" />
+                )}
               </div>
               <Drawer
                 isOpen={isDrawerOpen}
@@ -343,8 +446,8 @@ const Profile = () => {
           <TabPanel>
             <div className="flex flex-col items-center justify-center   w-full ">
               <div className="w-full flex flex-wrap gap-4 pl-16 ">
-              {data &&
-                  data.pendingDocs.map((i: any) => (
+                {editCloneList && editCloneList.cloneDocList.length > 0 ? (
+                  editCloneList.cloneDocList.map((i: any) => (
                     <Card key={i._id} w={"80"}>
                       <CardHeader>
                         <Heading size="sm">{i.title}</Heading>
@@ -355,45 +458,84 @@ const Profile = () => {
                       <Divider />
                       <CardFooter>
                         <Center width="full" justifyContent={"space-between"}>
-                          <Text>{i.stage}</Text>
-                          <Text>Version {i.version}</Text>
+                          <Button
+                            ref={cloneRef}
+                            colorScheme="teal"
+                            onClick={() => {
+                              setEditCloneDocumentId(i.cloneDocumentId);
+                              openClone();
+                              setEditCloneTitle(i.title);
+                              setEditCloneDescription(i.description);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            colorScheme="blue"
+                            onClick={() => {
+                              submitCloneMutate({
+                                cloneDocumentId: i.cloneDocumentId,
+                              });
+                            }}
+                            mr={3}
+                          >
+                            Submit
+                          </Button>
                         </Center>
                       </CardFooter>
                     </Card>
-                  ))}
+                  ))
+                ) : (
+                  <NoData display="No Cloned Document Found" />
+                )}
               </div>
             </div>
           </TabPanel>
         </TabPanels>
       </Tabs>
-      <AlertDialog
-        isOpen={isAlertOpen}
-        leastDestructiveRef={cancelRef}
-        motionPreset="slideInBottom"
-        onClose={alertClose}
+
+      <Drawer
+        isOpen={isCloneOpen}
+        placement="right"
+        size={"sm"}
+        onClose={closeClone}
+        finalFocusRef={cloneRef}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Submit for Review
-            </AlertDialogHeader>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Edit Document</DrawerHeader>
 
-            <AlertDialogBody>
-              Are you sure? You want to submit this document for review.
-            </AlertDialogBody>
+          <DrawerBody>
+            <div className="flex flex-col gap-4">
+              <FormControl isRequired>
+                <FormLabel>Title</FormLabel>
+                <Input
+                  value={editCloneTitle}
+                  onChange={(e: any) => setEditCloneTitle(e.target.value)}
+                  placeholder="Title"
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Description</FormLabel>
+                <Textarea
+                  value={editCloneDescription}
+                  onChange={(e: any) => setEditCloneDescription(e.target.value)}
+                />
+              </FormControl>
+            </div>
+          </DrawerBody>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={alertClose}>
-                Cancel
-              </Button>
-              <Button colorScheme="green" onClick={handleSubmit} ml={3}>
-                Submit
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-      {/* </div> */}
+          <DrawerFooter>
+            <Button variant="outline" mr={3} onClick={closeClone}>
+              Cancel
+            </Button>
+            <Button onClick={handleCloneEdit} colorScheme="blue">
+              Edit Clone Document
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };
