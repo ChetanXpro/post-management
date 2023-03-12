@@ -8,7 +8,7 @@ const connectDB = async () => {
 	try {
 		set('strictQuery', false)
 		const ccc = connect(
-			'mongodb+srv://chetan:chetan@cluster0.tr5f1lc.mongodb.net/duWebDB?retryWrites=true&w=majority',
+			process.env.DB_URI || '',
 
 			() => {
 				console.log('Database connected')
